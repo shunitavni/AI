@@ -1,0 +1,105 @@
+package main;
+
+import algorithms.*;
+import operators.*;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        final String srcFile = "input";
+        final String destFile = "output.txt";
+        int algorithmIndex; // Algorithm number: 1-IDS, 2-BFS , 3-AStar.
+        int n; //board size
+        
+        long startTime = 0;
+        long finishTime = 0;
+        long timeElapsed = 0;
+        
+        //both indicate the empty index
+        int emptyRowIdx = 0;
+        int emptyColidx = 0;
+
+        
+        Searcher<Board> searchAlgorithm = null;
+        
+        // The operators, organized by priority as requested.
+        Operators<Board>[] operators = new Operators[]{new Up(), new Down(), new Left(), new Right()};
+
+        //loop over the inputs file
+        for(int i = 0; i<1 ; i++) {
+        //Reading from input first line which indicate the algorithm number.
+        try {
+        	String fileName = srcFile+i+1+".txt";
+        	System.out.println(fileName);
+        	int x = 5;
+            Scanner scanner = new Scanner(new FileInputStream(srcFile));
+            algorithmIndex = Integer.parseInt(scanner.nextLine());
+            switch (algorithmIndex) {
+                case 1:
+                    searchAlgorithm = new IDS<>(operators, 100);
+                    break;
+                case 2:
+                    searchAlgorithm = new BFS<>(operators);
+                    break;
+                case 3:
+                    HeuristicFunc<Board> heuristicFunc = new ManhattanDist();
+                    searchAlgorithm = new AStar<>(operators, heuristicFunc);
+                    break;
+
+                default:
+                    System.out.println("Wrong algorithm input! Number must be 1-main.Algorithms.IDS,2-main.Algorithms.BFS or 3-A*.");
+                    System.exit(-1);
+                    break;
+            }
+
+            //Read next line from input.txt so we can set initial and goal board state.
+            n = Integer.parseInt(scanner.nextLine());
+            scanner.useDelimiter("-");
+            int[][] startBoard = new int[n][n];
+            int[][] goalBoard = new int[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                	startBoard[i][j] = scanner.nextInt();
+                    if (startBoard[i][j] == 0) {
+                        emptyRowIdx = i;
+                        emptyColidx = j;
+                    }
+                    goalBoard[i][j] = i * n + j + 1;
+
+                }
+            }
+            //initiate the last index in the array with the value - zero which indicate the supposed empty state (goal state)
+            goalBoard[n - 1][n - 1] = 0;
+
+            //create both current and goal state 
+            Node<Board> start = new Node<>(new Board(startBoard, emptyRowIdx, emptyColidx), null, null,0);
+            Node<Board> goal = new Node<>(new Board(goalBoard, n - 1, n - 1), null, null,0);
+            
+            //calculate time
+            startTime = System.currentTimeMillis();
+
+            String solution = searchAlgorithm.solve(start, goal);
+
+            //print the path solution to ootput.txt file
+            try {
+                PrintWriter writer = new PrintWriter(destFile);
+                writer.println(solution);
+                writer.close();
+                System.out.println(String.format("The solution is in file %s", destFile));
+                finishTime = System.currentTimeMillis();
+                timeElapsed = finishTime - startTime;
+                System.out.println("Took " + timeElapsed);
+            } catch (IOException e) {
+                System.out.println(String.format("Failed to open file. The solution is: %s", solution));
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("The file does not exist. Please try again.");
+        }
+    }
+    }
+}

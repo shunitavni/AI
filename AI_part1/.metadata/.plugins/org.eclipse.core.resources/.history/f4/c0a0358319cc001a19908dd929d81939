@@ -1,0 +1,36 @@
+package algorithms;
+
+import main.Node;
+import operators.Operators;
+import java.util.HashSet;
+import java.util.Set;
+
+public  abstract class Searcher<T> {
+    protected Set<Node<T>> close;
+    protected Operators<T>[] operators;
+    //final protected String didNotFindSolution = "Did not find solution";
+
+    public Searcher(Operators<T>[] operators) {
+        this.close = new HashSet<>();
+        this.operators = operators;
+    }
+
+    /*
+     * Create all the reachable states from the current state.
+     */
+    public abstract void addSuccessors(Node<T> node);
+
+
+    public abstract String solve(Node<T> init, Node<T> goal);
+
+    protected String path(Node<T> node) {
+        StringBuilder tmp = new StringBuilder();
+        Node<T> cameFrom = node.getCameFrom();
+        while (cameFrom != null) {
+            tmp.insert(0, node.getOp());
+            node = cameFrom;
+            cameFrom = node.getCameFrom();
+        }
+        return tmp.toString();
+    }
+}

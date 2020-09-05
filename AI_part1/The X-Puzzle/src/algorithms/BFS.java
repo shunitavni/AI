@@ -1,0 +1,64 @@
+package algorithms;
+
+import main.*;
+import operators.*;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------
+ *  ----------------------------------------------  BFS Algorithm - Notes -------------------------------------------------------------------
+ *
+ * In this algorithm we have two optimization implemented one using close-list and the second is double pruning as shown below.
+ * 
+ * Close-list - We put there nodes that we have already visited, every time before i ass new node to open-list we check if it is already in the close-list.
+ * The idea behind this stems from the thought that if I took the vertex out of the queue and it was not my goal I have no point in getting it in again and then once again getting it out of the queue because it does not help me, neither he nor his sons.
+ * 
+ * In terms of completeness - the algorithm is complete. If the graph containing the "target state" no matter how long it will take in the end the algorithm will find it.
+ * Optimality in this case -  is whether I get the cheapest and shortest solution.
+ * 
+ * ---------------------------------------------------------------------------------------------------------------------------------------------------------
+ */
+
+
+
+public class BFS<T> extends Searcher<T> {
+	private Queue<Node<T>> open;
+
+	public BFS(Operators<T>[] operators) {
+		super(operators);
+		this.open = new LinkedList<>();
+	}
+
+	/*
+	 * Add possible moves to open queue, according to the available operators.
+	 * */
+	@Override
+	public void addSuccessors(Node<T> node) {
+		T curState = node.getState();
+		for (int i = 0; i < this.operators.length; i++) {
+			T nextState = this.operators[i].doMove(curState);
+			if (nextState != null) {
+				Node<T> next = new Node<T>(nextState, this.operators[i].toString(), node,0);
+				if(!this.open.contains(next) && !this.close.contains(next))
+					this.open.add(next);
+			}
+		}
+	}
+
+	@Override
+	public String solve(Node<T> init, Node<T> goal) {
+		this.close.clear();
+		this.open.clear();
+		this.open.add(init);
+		while (!this.open.isEmpty()) {
+			Node<T> nextNode = open.poll();
+			if (nextNode.equals(goal))
+				return path(nextNode);
+			this.close.add(nextNode);
+			this.addSuccessors(nextNode);
+		}
+		return "No solution";
+	}
+
+}

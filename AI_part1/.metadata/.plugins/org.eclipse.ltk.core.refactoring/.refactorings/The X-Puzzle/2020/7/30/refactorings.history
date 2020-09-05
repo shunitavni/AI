@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;algorithms.DFS&apos; to &apos;DFS_L&apos;&#x0D;&#x0A;- Original project: &apos;The X-Puzzle&apos;&#x0D;&#x0A;- Original element: &apos;algorithms.DFS&apos;&#x0D;&#x0A;- Renamed element: &apos;algorithms.DFS_L&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;DFS&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;algorithms{DFS.java[DFS" matchStrategy="1" name="DFS_L" qualified="false" references="true" similarDeclarations="false" stamp="1595430268282" textual="false" version="1.0"/>
+</session>

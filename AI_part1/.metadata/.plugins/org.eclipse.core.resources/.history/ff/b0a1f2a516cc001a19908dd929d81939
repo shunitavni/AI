@@ -1,0 +1,48 @@
+package algorithms;
+
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class BFS<T> extends Searcher<T> {
+    private Queue<Node<T>> open;
+
+    public BFS(Operators<T>[] operators) {
+        super(operators);
+        this.open = new LinkedList<>();
+    }
+
+    /*
+     * Add possible moves to open queue, according to the available operators.
+     * */
+    @Override
+    public void addSuccessors(Node<T> node) {
+        T curState = node.getState();
+        for (int i = 0; i < this.operators.length; i++) {
+            T nextState = this.operators[i].doMove(curState);
+            if (nextState != null) {
+                Node<T> next = new Node<T>(nextState, this.operators[i].toString(), node,0);
+                if(!this.open.contains(next))
+                	this.open.add(next);
+            }
+        }
+    }
+
+    @Override
+    public String solve(Node<T> init, Node<T> goal) {
+        this.close.clear();
+        this.open.clear();
+        this.open.add(init);
+        while (!this.open.isEmpty()) {
+            Node<T> nextNode = open.poll();
+            if (!this.close.contains(nextNode) && !this.open.contains(nextNode)) {
+                if (nextNode.equals(goal))
+                    return path(nextNode);
+                this.close.add(nextNode);
+                this.addSuccessors(nextNode);
+            }
+        }
+        return "No solution";
+    }
+
+}

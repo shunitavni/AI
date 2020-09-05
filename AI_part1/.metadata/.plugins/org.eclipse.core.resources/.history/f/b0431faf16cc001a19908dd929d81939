@@ -1,0 +1,31 @@
+package algorithms;
+
+public class IDS<T> extends Searcher<T> {
+    private DFS<T> dfs;
+    private int maxDepth;
+
+    public IDS(Operators<T>[] operators, int maxDepth) {
+        super(operators);
+        this.maxDepth = maxDepth;
+    }
+
+
+    @Override
+    public void addSuccessors(Node<T> node) {
+        this.dfs.addSuccessors(node);
+    }
+
+
+    @Override
+    public String solve(Node<T> init, Node<T> goal) {
+        String result;
+        for (int limit = 0; limit <= maxDepth; limit++) {
+            this.dfs = new DFS<>(operators, limit);
+            result = this.dfs.solve(init, goal);
+            if (!result.equals("No solution")) {
+                return result;
+            }
+        }
+        return "No solution with limit: " + maxDepth;
+    }
+}

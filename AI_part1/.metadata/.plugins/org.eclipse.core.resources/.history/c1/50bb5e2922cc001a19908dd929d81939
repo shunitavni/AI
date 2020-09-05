@@ -1,0 +1,32 @@
+package operators;
+
+import main.Board;
+import java.util.Arrays;
+
+public class Up extends Operators<Board> {
+
+    public Up() {
+        super("U");
+    }
+
+    @Override
+    public Board doMove(Board state) {
+    	int[][] board = state.getBoard(); //this is the current state
+
+        if (board.length-1==state.getEmptyR())
+            return null;
+
+    	int[][] matx = new int[board.length][board[0].length];
+    	
+    	for(int i=0; i<board.length; i++)
+            matx[i] = Arrays.copyOf(board[i], board.length);
+       
+    	//now we will implement the up operator by moving up the value in the index that below the empty space in the array
+        matx[state.getEmptyR()][state.getEmptyC()] = matx[state.getEmptyR() + 1][state.getEmptyC()]; 
+        //and here we are reposition the empty space in the array
+        matx[state.getEmptyR() + 1][state.getEmptyC()] = 0;
+
+        //returning the new state with the new emptyR + emptyC
+        return new Board(matx,state.getEmptyR() + 1,state.getEmptyC());
+    }
+}

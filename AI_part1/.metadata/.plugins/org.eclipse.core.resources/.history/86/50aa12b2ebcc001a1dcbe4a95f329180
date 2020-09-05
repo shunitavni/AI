@@ -1,0 +1,80 @@
+package algorithms;
+
+import main.*;
+import operators.*;
+
+
+import java.util.PriorityQueue;
+
+/*---------------------------------------------------------------------------------------------------------------------------------------------------------
+ *  ----------------------------------------------        A* Algorithm - Notes    -------------------------------------------------------------------------
+ *
+ * In this algorithm we use Manhattan distance function as requested.
+ * 
+ * Duplicate pruning - if a descendant vertex is already in the close-list, there is no need to enter the vertex at all.
+ * If it is in open-list, and now we have a new value lower than the same vertex in open-list, the open-list must be updated with the new value.
+ * 
+ * ---------------------------------------------------------------------------------------------------------------------------------------------------------
+ */
+
+
+public class AStar<T> extends Searcher<T> {
+	private PriorityQueue<Node<T>> open;
+	private HeuristicFunc<T> hFunc;
+
+	public AStar(Operators<T>[] operators, HeuristicFunc<T> h) {
+		super(operators);
+		this.hFunc = h;
+	}
+
+	/*
+	 * Add possible moves to open priority queue, according to the available operators.
+	 * If open-list already contains the same state, it will be updated to the minimum cost.
+	 * */
+	@Override
+	public void addSuccessors(Node<T> node) {
+		for (int i = 0; i < this.operators.length; i++) {
+			T currentState = node.getState();
+			T nextState = this.operators[i].doMove(currentState);
+			if (nextState != null) {
+				Node<T> newNode = new Node<>(nextState, this.operators[i].toString(), node, node.getDepth() + 1);
+				if (open.contains(newNode)) {
+					open.forEach((n) -> {
+						if (n.equals(newNode) && n.getDepth() > newNode.getDepth()) {
+							open.remove(n);
+						}
+					});
+				}
+				if (!close.contains(newNode)) {
+					this.open.add(newNode);
+				}
+			}
+		}
+	}
+
+	@Override
+	public String solve(Node<T> init, Node<T> goal) {
+		close.clear();
+		this.hFunc.setGoalStateMap(goal.getState());
+		this.open = new PriorityQueue<>((n1, n2) -> {
+			int n1h = hFunc.dist(n1.getState());
+			int f1 = n1.getDepth() + n1h;
+			int n2h = hFunc.dist(n2.getState());
+			int f2 = n2.getDepth() + n2h;
+			return Integer.compare(f1, f2);
+		});
+		this.open.add(init);
+		while (!open.isEmpty()) {
+			Node<T> currentNode = open.poll();
+			if (!close.contains(currentNode)) {
+				if (currentNode.equals(goal)) {
+					return this.path(currentNode);
+				}
+				this.close.add(currentNode);
+				this.addSuccessors(currentNode);
+			}
+		}
+
+		return "No solution";
+	}
+}
